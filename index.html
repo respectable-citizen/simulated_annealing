@@ -1,0 +1,129 @@
+
+<style>
+
+body {
+	margin: 0;
+}
+
+</style>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+class SearchInstance {
+	constructor() {
+    	this.solution = Math.floor(Math.random() * canvas.width);
+    }
+    
+    iterate() {
+    	let neighbor;
+    	if (Math.random() < 0.5) {
+        	neighbor = this.solution - 1;
+      	} else {
+        	neighbor = this.solution + 1;
+      	}
+
+      	let cost = landscape[this.solution] - landscape[neighbor];
+
+      	let acceptProbability = Math.exp(-cost / temperature);
+      	if ((landscape[neighbor] > landscape[this.solution]) || (Math.random() < acceptProbability)) {
+        	this.solution = neighbor;
+      	}
+    }
+}
+
+let canvas = document.getElementById("canvas");
+let context = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let landscape = [];
+let searchInstances = [];
+
+let solution = Math.floor(canvas.width / 2);
+let temperature = 25;
+
+let bestSolution;
+
+const iterationsPerFrame = 3000;
+const searchInstanceCount = 3;
+
+function initialize() {
+	let currentY = Math.floor(canvas.height / 2);
+    let bestSolutionValue;
+	for (let i = 0; i < canvas.width; i++) {
+    	if (!bestSolutionValue || currentY > bestSolutionValue) {
+        	bestSolutionValue = currentY;
+            bestSolution = i;
+        }
+    	landscape.push(currentY);
+        let x = Math.random();
+        if (x < (1/3)) {
+        	currentY += 8;
+        } else if (x < (2/3)) {
+        	currentY -= 8;
+        }
+    }
+    
+    for (let i = 0; i < searchInstanceCount; i++) searchInstances.push(new SearchInstance());
+    draw();
+}
+
+function clear() {
+	context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawLandscape() {
+	context.beginPath();
+    for (let x = 0; x < canvas.width; x++) {
+    	context.lineTo(x, landscape[x]);
+    }
+    context.stroke();
+}
+
+function draw() {
+	clear();
+    drawLandscape();
+    
+    //Draw temperature
+    context.font = "30px Arial";
+    context.fillStyle = "black";
+    context.strokeText(`Temperature: ${temperature.toFixed(2)}`, 10, 30);
+    
+    //Draw current solutions
+    for (let i = 0; i < searchInstanceCount; i++) {
+    	let searchInstance = searchInstances[i];
+        
+        context.beginPath();
+        context.moveTo(searchInstance.solution, 0);
+        context.lineTo(searchInstance.solution, canvas.height);
+        context.stroke();
+    }
+    
+    //Draw best solution
+    context.strokeStyle = "red";
+    context.beginPath();
+    context.moveTo(bestSolution, 0);
+	context.lineTo(bestSolution, canvas.height);
+	context.stroke();
+    context.strokeStyle = "black";
+    
+    
+    //Simulated annealing
+    for (let i = 0; i < iterationsPerFrame; i++) {
+        for (let j = 0; j < searchInstanceCount; j++) {
+			searchInstances[j].iterate();
+        }
+    }
+    
+    temperature -= 0.01;
+    if (temperature < 0) temperature = 0;
+    requestAnimationFrame(draw);
+}
+
+initialize();
+
+</script>
