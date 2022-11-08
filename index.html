@@ -43,12 +43,12 @@ let landscape = [];
 let searchInstances = [];
 
 let solution = Math.floor(canvas.width / 2);
-let temperature = 25;
+let temperature = 90;
 
 let bestSolution;
 
-const iterationsPerFrame = 3000;
-const searchInstanceCount = 3;
+const iterationsPerFrame = 10000;
+const searchInstanceCount = 10;
 
 function initialize() {
 	let currentY = Math.floor(canvas.height / 2);
@@ -118,7 +118,7 @@ function draw() {
         }
     }
     
-    temperature -= 0.01;
+    temperature -= 0.1;
     if (temperature < 0) temperature = 0;
     requestAnimationFrame(draw);
 }
