@@ -72,12 +72,12 @@ function initialize() {
 }
 
 function clear() {
-	context.fillStyle = "white";
+    context.fillStyle = "white";
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawLandscape() {
-	context.beginPath();
+    context.beginPath();
     for (let x = 0; x < canvas.width; x++) {
     	context.lineTo(x, landscape[x]);
     }
@@ -85,7 +85,7 @@ function drawLandscape() {
 }
 
 function draw() {
-	clear();
+    clear();
     drawLandscape();
     
     //Draw temperature
@@ -107,15 +107,14 @@ function draw() {
     context.strokeStyle = "red";
     context.beginPath();
     context.moveTo(bestSolution, 0);
-	context.lineTo(bestSolution, canvas.height);
-	context.stroke();
+    context.lineTo(bestSolution, canvas.height);
+    context.stroke();
     context.strokeStyle = "black";
-    
     
     //Simulated annealing
     for (let i = 0; i < iterationsPerFrame; i++) {
         for (let j = 0; j < searchInstanceCount; j++) {
-			searchInstances[j].iterate();
+            searchInstances[j].iterate();
         }
     }
     
