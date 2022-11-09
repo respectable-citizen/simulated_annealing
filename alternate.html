@@ -1,0 +1,71 @@
+
+<h1 id="text"></h1>
+
+<script>
+//Yes, using simulated annealing for a problem like this is very much overkill.
+//But it's cool and practice so 0 complaints from me.
+
+let text = document.getElementById("text");
+
+let solution = "Hello, World!";
+let currentSolution = "";
+
+let temperature = 30;
+
+const iterationsPerFrame = 10;
+
+function randomCharacter() {
+	const characters = "abcdefghijklmnopqrstuvwxyz";
+
+	return characters[Math.floor(Math.random() * characters.length)];
+}
+
+function scoreState(state) {
+	let difference = 0;
+	for (let i = 0; i < state.length; i++) {
+		difference += Math.abs(state.charCodeAt(i) - solution.charCodeAt(i));
+	}
+	
+	return difference;
+}
+
+function initialize() {
+	for (let i = 0; i < solution.length; i++) currentSolution += randomCharacter();
+
+	draw();
+}
+
+function draw() {
+	for (let i = 0; i < iterationsPerFrame; i++) {
+		//Simulated annealing
+		//Generate random change
+		let neighbor = currentSolution.split("");
+		let randomIndex = Math.floor(Math.random() * solution.length);
+		let change = (Math.random() < 0.5) ? -1 : 1;
+		neighbor[randomIndex] = String.fromCharCode(neighbor[randomIndex].charCodeAt(0) + change);
+		neighbor = neighbor.join("");
+
+		//Determine if change makes solution better or worse
+		let solutionScore = scoreState(currentSolution);
+		let neighborScore = scoreState(neighbor);
+	
+		//Decide if we should accept change or not
+		let difference = neighborScore - solutionScore;
+		let acceptProbability = Math.exp(-difference / temperature)
+	
+		if (neighborScore < solutionScore || Math.random() < acceptProbability) {
+			currentSolution = neighbor;
+		}
+	}
+
+	text.innerHTML = `${currentSolution}<br>${temperature.toFixed(1)}<br>${scoreState(currentSolution)}`;
+
+	temperature -= 0.1;
+	if (temperature < 0) temperature = 0;
+
+	requestAnimationFrame(draw);
+}
+
+initialize();
+
+</script>
